@@ -15,6 +15,7 @@ import java.util.Set;
 
 public class UserValidationTest {
     private static Validator validator;
+
     static {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.usingContext().getValidator();

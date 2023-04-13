@@ -15,39 +15,39 @@ import java.util.List;
 import java.util.Set;
 
 class FilmValidationTests {
-	private static Validator validator;
+    private static Validator validator;
 
-	static {
-		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-		validator = validatorFactory.usingContext().getValidator();
-	}
+    static {
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.usingContext().getValidator();
+    }
 
-	@Test
-	void validatorsTest() {
-		final Film emptyFilm = Film.builder().build();
-		Set<ConstraintViolation<Film>> validates = validator.validate(emptyFilm);
-		Assertions.assertEquals(1, validates.size());
-		Assertions.assertEquals("Название не может быть пустым", validates.stream()
-				.iterator()
-				.next()
-				.getMessage());
+    @Test
+    void validatorsTest() {
+        final Film emptyFilm = Film.builder().build();
+        Set<ConstraintViolation<Film>> validates = validator.validate(emptyFilm);
+        Assertions.assertEquals(1, validates.size());
+        Assertions.assertEquals("Название не может быть пустым", validates.stream()
+                .iterator()
+                .next()
+                .getMessage());
 
-		validates.clear();
+        validates.clear();
 
-		final Film film = emptyFilm.toBuilder()
-				.name(" 	 ")
-				.description("About film")
-				.releaseDate(LocalDate.of(1895, 12, 27))
-				.duration(Duration.ofMinutes(-130))
-				.build();
-		validates = validator.validate(film);
-		Assertions.assertEquals(3, validates.size());
-		List<String> errorMessages = new ArrayList<>();
-		validates.stream()
-				.map(ConstraintViolation::getMessage)
-				.forEach(errorMessages::add);
-		Assertions.assertTrue(errorMessages.contains("Название не может быть пустым"));
-		Assertions.assertTrue(errorMessages.contains("Дата релиза - не раньше 28 декабря 1895 года"));
-		Assertions.assertTrue(errorMessages.contains("Длительность должна быть положительная"));
-	}
+        final Film film = emptyFilm.toBuilder()
+                .name(" 	 ")
+                .description("About film")
+                .releaseDate(LocalDate.of(1895, 12, 27))
+                .duration(Duration.ofMinutes(-130))
+                .build();
+        validates = validator.validate(film);
+        Assertions.assertEquals(3, validates.size());
+        List<String> errorMessages = new ArrayList<>();
+        validates.stream()
+                .map(ConstraintViolation::getMessage)
+                .forEach(errorMessages::add);
+        Assertions.assertTrue(errorMessages.contains("Название не может быть пустым"));
+        Assertions.assertTrue(errorMessages.contains("Дата релиза - не раньше 28 декабря 1895 года"));
+        Assertions.assertTrue(errorMessages.contains("Длительность должна быть положительная"));
+    }
 }
