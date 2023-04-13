@@ -16,6 +16,7 @@ import java.util.Set;
 
 class FilmValidationTests {
 	private static Validator validator;
+
 	static {
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 		validator = validatorFactory.usingContext().getValidator();
