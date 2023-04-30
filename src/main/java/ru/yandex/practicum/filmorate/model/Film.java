@@ -6,8 +6,11 @@ import org.hibernate.validator.constraints.time.DurationMin;
 import ru.yandex.practicum.filmorate.validators.StartDate;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +19,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(exclude = {"id"})
 @Builder(toBuilder = true)
 public class Film {
+    @PositiveOrZero
     private int id;
     @NotBlank(message = "Название не может быть пустым")
     private String name;
@@ -25,4 +29,5 @@ public class Film {
     private LocalDate releaseDate;
     @DurationMin(seconds = 1, message = "Длительность должна быть положительная")
     private Duration duration;
+    private Set<Integer> likedUsers = new HashSet<>();
 }
