@@ -6,12 +6,13 @@ import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> filmMap = new HashMap<>();
-    private static int id = 1;
+    private static AtomicInteger id = new AtomicInteger(1);
 
     @Override
     public Collection<Film> getFilms() {
@@ -21,7 +22,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(Integer id) {
-        if (!isExist(id)) {
+        if (isExist(id)) {
             log.debug("Попытка найти фильм с несуществующим id {}", id);
             throw new FilmNotFoundException("Фильм с id " + id + " не найден");
         }
@@ -30,7 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film addNewFilm(Film film) {
-        film.setId(id++);
+        film.setId(id.getAndIncrement());
         log.debug("Добавлен новый фильм: {}", film);
         filmMap.put(film.getId(), film);
         return film;
@@ -38,7 +39,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        if (!filmMap.containsKey(film.getId())) {
+        if (isExist(film.getId())) {
             log.debug("Фильм с id {} не найден", film.getId());
             throw new FilmNotFoundException("Фильм с id " + film.getId() + " не найден");
         }
@@ -48,6 +49,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     private boolean isExist(int id) {
-        return filmMap.containsKey(id);
+        return !filmMap.containsKey(id);
     }
 }

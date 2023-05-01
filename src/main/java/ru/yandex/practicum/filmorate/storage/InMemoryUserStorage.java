@@ -6,12 +6,13 @@ import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> userMap = new HashMap<>();
-    private static int id = 1;
+    private static AtomicInteger id = new AtomicInteger(1);
 
     @Override
     public Collection<User> getUsers() {
@@ -21,7 +22,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(Integer id) {
-        if (!isExist(id)) {
+        if (isExist(id)) {
             log.debug("Попытка найти пользователя с несуществующим id {}", id);
             throw new UserNotFoundException("Пользователь с id " + id + " не найден");
         }
@@ -30,7 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addNewUser(User user) {
-        user.setId(id++);
+        user.setId(id.getAndIncrement());
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -41,7 +42,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        if (!userMap.containsKey(user.getId())) {
+        if (isExist(user.getId())) {
             log.debug("Пользователя с id {} не существует", user.getId());
             throw new UserNotFoundException("Пользователя с id " + user.getId() + " не существует");
         }
@@ -51,6 +52,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     private boolean isExist(int id) {
-        return userMap.containsKey(id);
+        return !userMap.containsKey(id);
     }
 }

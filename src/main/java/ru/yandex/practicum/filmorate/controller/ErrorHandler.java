@@ -25,7 +25,7 @@ public class ErrorHandler {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
-            log.debug("Ошибка валидации - {}: {}", fieldName, errorMessage);
+            log.error("Ошибка валидации - {}: {}", fieldName, errorMessage);
         });
         return errors;
     }
