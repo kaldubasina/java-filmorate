@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -23,7 +24,8 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        return userStorage.getUserById(id);
+        return userStorage.getUserById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
     }
 
     public User addNewUser(User user) {
@@ -35,34 +37,18 @@ public class UserService {
     }
 
     public void addFriend(Integer userId, Integer friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        user.getFriendsId().add(friend.getId());
-        friend.getFriendsId().add(user.getId());
-        log.debug("Пользователи с id {} и {} стали друзьями", userId, friendId);
+        userStorage.addFriend(userId, friendId);
     }
 
-    public void removeFromFriends(Integer userId, Integer friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        user.getFriendsId().remove(friend.getId());
-        friend.getFriendsId().remove(user.getId());
-        log.debug("Пользователи с id {} и {} больше не друзья", userId, friendId);
+    public void removeFriend(Integer userId, Integer friendId) {
+        userStorage.removeFriend(userId, friendId);
     }
 
-    public Collection<User> getFriends(Integer userId) {
-        Collection<Integer> friendsId = userStorage.getUserById(userId).getFriendsId();
-        Collection<User> friends = userStorage.getUsers();
-        friends.removeIf(v -> !friendsId.contains(v.getId()));
-        log.debug("Получение списка друзей пользователя с id {}", userId);
-        return friends;
+    public Collection<User> getUserFriends(Integer userId) {
+        return userStorage.getUserFriends(userId);
     }
 
     public Collection<User> getCommonFriends(Integer userId, Integer otherId) {
-        Collection<User> userFriendsId = getFriends(userId);
-        Collection<User> otherFriendsId = getFriends(otherId);
-        userFriendsId.retainAll(otherFriendsId);
-        log.debug("Получение списка общих друзей пользователей с id {} и {}", userId, otherId);
-        return userFriendsId;
+        return userStorage.getCommonFriends(userId, otherId);
     }
 }
