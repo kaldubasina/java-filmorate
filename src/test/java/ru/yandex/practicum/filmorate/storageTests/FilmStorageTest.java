@@ -42,7 +42,7 @@ public class FilmStorageTest {
                 "  \"mpa\": { \"id\": 1, \"name\": \"G\"}\n" +
                 "}";
         Film film = objectMapper.readValue(json, Film.class);
-        assertThat(filmStorage.addNewFilm(film))
+        assertThat(filmStorage.addNew(film))
                 .extracting(Film::getName,
                         Film::getDescription,
                         Film::getReleaseDate,
@@ -54,7 +54,7 @@ public class FilmStorageTest {
                         film.getDuration(),
                         film.getMpa());
 
-        Film film2 = filmStorage.addNewFilm(film.toBuilder()
+        Film film2 = filmStorage.addNew(film.toBuilder()
                 .name("terminator")
                 .description("destroy John Connor")
                 .releaseDate(LocalDate.of(1984, 4, 11))
@@ -77,13 +77,13 @@ public class FilmStorageTest {
     @Test
     @Order(2)
     public void testUpdateFilm() {
-        Film filmForUpdate = filmStorage.getFilmById(2).get()
+        Film filmForUpdate = filmStorage.getById(2).get()
                 .toBuilder()
                 .name("terminator 2")
                 .description("save John Connor")
                 .rate(4)
                 .build();
-        assertThat(filmStorage.updateFilm(filmForUpdate))
+        assertThat(filmStorage.update(filmForUpdate))
                 .extracting(Film::getId,
                         Film::getName,
                         Film::getDescription,
@@ -103,14 +103,14 @@ public class FilmStorageTest {
     @Test
     @Order(3)
     public void testGetFilms() {
-        Collection<Film> films = filmStorage.getFilms();
+        Collection<Film> films = filmStorage.getAll();
         assertThat(films).asList().hasSize(2);
     }
 
     @Test
     @Order(4)
     public void testGetFilmById() {
-        Optional<Film> film = filmStorage.getFilmById(1);
+        Optional<Film> film = filmStorage.getById(1);
         assertThat(film)
                 .isPresent()
                 .hasValueSatisfying(f ->
@@ -119,16 +119,16 @@ public class FilmStorageTest {
 
         assertThatExceptionOfType(FilmNotFoundException.class)
                 .isThrownBy(() ->
-                        filmStorage.getFilmById(999))
+                        filmStorage.getById(999))
                 .withMessage("Фильм с id 999 не найден");
     }
 
     @Test
     @Order(5)
     public void testGetMostPopularFilm() {
-        Film film = filmStorage.getFilmById(2).get();
+        Film film = filmStorage.getById(2).get();
         List<Film> filmSet = new ArrayList<>(Collections.singleton(film));
 
-        assertEquals(filmStorage.getPopularFilms(1), filmSet);
+        assertEquals(filmStorage.getPopular(1), filmSet);
     }
 }

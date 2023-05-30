@@ -26,14 +26,14 @@ public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Collection<User> getUsers() {
+    public Collection<User> getAll() {
         String sqlQuery = "select * " +
                 "from users";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
-    public Optional<User> getUserById(Integer id) {
+    public Optional<User> getById(Integer id) {
         String sqlQuery = "select * " +
                 "from users " +
                 "where id = ?";
@@ -45,16 +45,16 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User addNewUser(User user) {
+    public User addNew(User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
         int userId = simpleJdbcInsert.executeAndReturnKey(user.toMap()).intValue();
-        return getUserById(userId).get();
+        return getById(userId).get();
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         String sqlQuery = "update users set " +
                 "email = ?, " +
                 "login = ?, " +
@@ -67,13 +67,13 @@ public class UserDbStorage implements UserStorage {
                 user.getName(),
                 user.getBirthday(),
                 user.getId());
-        return getUserById(user.getId())
+        return getById(user.getId())
                 .orElseThrow(() ->
                         new UserNotFoundException("Пользователь с id " + user.getId() + " не найден"));
     }
 
     @Override
-    public Set<User> getUserFriends(Integer userId) {
+    public Set<User> getFriendsByUserId(Integer userId) {
         String sqlQuery = "select * " +
                 "from users " +
                 "where id in " +
@@ -85,17 +85,17 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Set<User> getCommonFriends(Integer id, Integer otherId) {
-        return getUserFriends(id).stream()
-                .filter(getUserFriends(otherId)::contains)
+        return getFriendsByUserId(id).stream()
+                .filter(getFriendsByUserId(otherId)::contains)
                 .collect(Collectors.toSet());
     }
 
     @Override
     public void addFriend(Integer userId, Integer friendId) {
-        getUserById(userId)
+        getById(userId)
                 .orElseThrow(() ->
                         new UserNotFoundException("Пользователь с id " + userId + " не найден"));
-        getUserById(friendId)
+        getById(friendId)
                 .orElseThrow(() ->
                         new UserNotFoundException("Пользователь с id " + friendId + " не найден"));
         String sqlQuery = "insert into user_friends " +
@@ -106,10 +106,10 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void removeFriend(Integer userId, Integer friendId) {
-        getUserById(userId)
+        getById(userId)
                 .orElseThrow(() ->
                         new UserNotFoundException("Пользователь с id " + userId + " не найден"));
-        getUserById(friendId)
+        getById(friendId)
                 .orElseThrow(() ->
                         new UserNotFoundException("Пользователь с id " + friendId + " не найден"));
         String sqlQuery = "delete from user_friends " +
@@ -125,7 +125,7 @@ public class UserDbStorage implements UserStorage {
                 .login(resultSet.getString("login"))
                 .name(resultSet.getString("name"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
-                .friends(getUserFriends(resultSet.getInt("id")))
+                .friends(getFriendsByUserId(resultSet.getInt("id")))
                 .build();
     }
 }

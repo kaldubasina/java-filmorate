@@ -17,22 +17,22 @@ public class GenreService {
     }
 
     public Genre getGenreById(Integer id) {
-        return genreDbStorage.getGenreById(id);
+        return genreDbStorage.getById(id);
     }
 
     public Collection<Genre> getGenres() {
-        return genreDbStorage.getGenres();
+        return genreDbStorage.getAll();
     }
 
     public Genre addNewGenre(Genre genre) {
-        return genreDbStorage.addNewGenre(genre);
+        return genreDbStorage.addNew(genre);
     }
 
     public Genre updateGenre(Genre genre) {
-        return genreDbStorage.updateGenre(genre);
+        return genreDbStorage.update(genre);
     }
 
     public void removeGenreById(Integer id) {
-        genreDbStorage.removeGenreById(id);
+        genreDbStorage.removeById(id);
     }
 }

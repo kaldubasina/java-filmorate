@@ -18,20 +18,20 @@ public class FilmService {
     }
 
     public Collection<Film> getFilms() {
-        return filmStorage.getFilms();
+        return filmStorage.getAll();
     }
 
     public Film getFilmById(Integer id) {
-        return filmStorage.getFilmById(id)
+        return filmStorage.getById(id)
                 .orElseThrow(() -> new FilmNotFoundException("Фильм с id " + id + " не найден"));
     }
 
     public Film addNewFilm(Film film) {
-        return filmStorage.addNewFilm(film);
+        return filmStorage.addNew(film);
     }
 
     public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+        return filmStorage.update(film);
     }
 
     public void addLike(Integer filmId, Integer userId) {
@@ -43,6 +43,6 @@ public class FilmService {
     }
 
     public Collection<Film> getPopularFilms(Integer count) {
-        return filmStorage.getPopularFilms(count);
+        return filmStorage.getPopular(count);
     }
 }

@@ -17,7 +17,7 @@ import java.util.*;
 public class MpaDbStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public Mpa getMpaById(Integer id) {
+    public Mpa getById(Integer id) {
         String sqlQuery = "select * " +
                 "from mpa " +
                 "where id = ?";
@@ -29,34 +29,34 @@ public class MpaDbStorage {
         }
     }
 
-    public Collection<Mpa> getMpas() {
+    public Collection<Mpa> getAll() {
         String sqlQuery = "select * " +
                 "from mpa " +
                 "order by id";
         return jdbcTemplate.query(sqlQuery, this::mapRowToMpa);
     }
 
-    public Mpa addNewMpa(Mpa mpa) {
+    public Mpa addNew(Mpa mpa) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("mpa")
                 .usingGeneratedKeyColumns("id");
 
-        return getMpaById(simpleJdbcInsert
+        return getById(simpleJdbcInsert
                 .executeAndReturnKey(Collections.singletonMap("name", mpa.getName()))
                 .intValue());
     }
 
-    public Mpa updateMpa(Mpa mpa) {
+    public Mpa update(Mpa mpa) {
         String sqlQuery = "update mpa set " +
                 "name = ? " +
                 "where id = ?";
         jdbcTemplate.update(sqlQuery,
                 mpa.getName(),
                 mpa.getId());
-        return getMpaById(mpa.getId());
+        return getById(mpa.getId());
     }
 
-    public void removeMpaById(Integer id) {
+    public void removeById(Integer id) {
         String sqlQuery = "delete from mpa where id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }

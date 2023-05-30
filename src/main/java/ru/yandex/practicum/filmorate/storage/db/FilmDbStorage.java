@@ -27,14 +27,14 @@ public class FilmDbStorage implements FilmStorage {
     private final GenreDbStorage genreDbStorage;
 
     @Override
-    public Collection<Film> getFilms() {
+    public Collection<Film> getAll() {
         String sqlQuery = "select * " +
                 "from films";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
     @Override
-    public Optional<Film> getFilmById(Integer id) {
+    public Optional<Film> getById(Integer id) {
         String sqlQuery = "select * " +
                 "from films " +
                 "where id = ?";
@@ -46,17 +46,17 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film addNewFilm(Film film) {
+    public Film addNew(Film film) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
         int filmId = simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue();
         genreDbStorage.updateFilmGenres(filmId, film);
-        return getFilmById(filmId).get();
+        return getById(filmId).get();
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         String sqlQuery = "update films set " +
                 "name = ?, " +
                 "description = ?, " +
@@ -74,7 +74,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getRate(),
                 film.getId());
         genreDbStorage.updateFilmGenres(film.getId(), film);
-        return getFilmById(film.getId())
+        return getById(film.getId())
                 .orElseThrow(() -> new FilmNotFoundException("Фильм с id " + film.getId() + " не найден"));
     }
 
@@ -98,7 +98,7 @@ public class FilmDbStorage implements FilmStorage {
     public void removeLike(Integer filmId, Integer userId) {
         String sqlQuery = "delete from film_likes " +
                 "where film_id = ? and user_id = ?";
-        if (!getFilmById(filmId).orElseThrow(() ->
+        if (!getById(filmId).orElseThrow(() ->
                         new FilmNotFoundException("Фильм с id " + filmId + " не найден"))
                 .getLikedUsers()
                 .contains(userId)) {
@@ -108,7 +108,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getPopularFilms(Integer count) {
+    public Collection<Film> getPopular(Integer count) {
         String sqlQuery = "select f.* " +
                 "from films f " +
                 "left join film_likes as fl on f.id = fl.film_id " +
@@ -132,8 +132,8 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("date").toLocalDate())
                 .duration(Duration.ofSeconds(resultSet.getInt("duration")))
-                .mpa(mpaDbStorage.getMpaById(resultSet.getInt("mpa_id")))
-                .genres(genreDbStorage.getFilmGenres(resultSet.getInt("id")))
+                .mpa(mpaDbStorage.getById(resultSet.getInt("mpa_id")))
+                .genres(genreDbStorage.getAllByFilmId(resultSet.getInt("id")))
                 .likedUsers(new HashSet<>(getLikedUsersId(resultSet.getInt("id"))))
                 .rate(resultSet.getInt("rate"))
                 .build();

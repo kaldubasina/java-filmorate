@@ -18,7 +18,7 @@ import java.util.*;
 public class GenreDbStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public Genre getGenreById(Integer id) {
+    public Genre getById(Integer id) {
         String sqlQuery = "select * " +
                 "from genres " +
                 "where id = ?";
@@ -30,7 +30,7 @@ public class GenreDbStorage {
         }
     }
 
-    public Set<Genre> getFilmGenres(Integer filmId) {
+    public Set<Genre> getAllByFilmId(Integer filmId) {
         String sqlQuery = "select * " +
                 "from genres " +
                 "where id in " +
@@ -54,33 +54,33 @@ public class GenreDbStorage {
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
-    public Collection<Genre> getGenres() {
+    public Collection<Genre> getAll() {
         String sqlQuery = "select * " +
                 "from genres " +
                 "order by id";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
     }
 
-    public Genre addNewGenre(Genre genre) {
+    public Genre addNew(Genre genre) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("genres")
                 .usingGeneratedKeyColumns("id");
 
-        return getGenreById(simpleJdbcInsert.executeAndReturnKey(Collections.singletonMap("name", genre.getName()))
+        return getById(simpleJdbcInsert.executeAndReturnKey(Collections.singletonMap("name", genre.getName()))
                 .intValue());
     }
 
-    public Genre updateGenre(Genre genre) {
+    public Genre update(Genre genre) {
         String sqlQuery = "update genres set " +
                 "name = ? " +
                 "where id = ?";
         jdbcTemplate.update(sqlQuery,
                 genre.getName(),
                 genre.getId());
-        return getGenreById(genre.getId());
+        return getById(genre.getId());
     }
 
-    public void removeGenreById(Integer id) {
+    public void removeById(Integer id) {
         String removeFromGenres = "delete from genres where id = ?";
         jdbcTemplate.update(removeFromGenres, id);
         String removeFilmGenreLink = "delete from film_genres where genre_id = ?";

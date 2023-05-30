@@ -37,7 +37,7 @@ public class UserStorageTest {
                 "\"email\":\"mail@mail.ru\", " +
                 "\"birthday\":\"1946-08-20\"}";
         User user = objectMapper.readValue(json, User.class);
-        assertThat(userStorage.addNewUser(user))
+        assertThat(userStorage.addNew(user))
                 .extracting(User::getLogin,
                         User::getName,
                         User::getEmail,
@@ -47,7 +47,7 @@ public class UserStorageTest {
                         user.getEmail(),
                         user.getBirthday());
 
-        User user2 = userStorage.addNewUser(user.toBuilder()
+        User user2 = userStorage.addNew(user.toBuilder()
                 .login("marty")
                 .email("pochta@mail.ru")
                 .birthday(LocalDate.of(2000, 4, 11))
@@ -66,7 +66,7 @@ public class UserStorageTest {
     @Test
     @Order(2)
     public void testGetUserById() {
-        Optional<User> user = userStorage.getUserById(1);
+        Optional<User> user = userStorage.getById(1);
         assertThat(user)
                 .isPresent()
                 .hasValueSatisfying(u ->
@@ -75,25 +75,25 @@ public class UserStorageTest {
 
         assertThatExceptionOfType(UserNotFoundException.class)
                 .isThrownBy(() ->
-                        userStorage.getUserById(999))
+                        userStorage.getById(999))
                 .withMessage("Пользователь с id 999 не найден");
     }
 
     @Test
     @Order(3)
     public void testGetUsers() {
-        Collection<User> users = userStorage.getUsers();
+        Collection<User> users = userStorage.getAll();
         assertThat(users).asList().hasSize(2);
     }
 
     @Test
     @Order(4)
     public void testUpdateUser() {
-        User userForUpdate = userStorage.getUserById(2).get()
+        User userForUpdate = userStorage.getById(2).get()
                 .toBuilder()
                 .login("johny")
                 .build();
-        assertThat(userStorage.updateUser(userForUpdate))
+        assertThat(userStorage.update(userForUpdate))
                 .extracting(User::getId,
                         User::getLogin,
                         User::getName,
@@ -109,13 +109,13 @@ public class UserStorageTest {
     @Test
     @Order(5)
     public void testFriends() {
-        User user = userStorage.getUserById(2).get();
+        User user = userStorage.getById(2).get();
         Set<User> userSet = new HashSet<>(Collections.singleton(user));
 
         userStorage.addFriend(1, 2);
-        assertEquals(userStorage.getUserFriends(1), userSet);
+        assertEquals(userStorage.getFriendsByUserId(1), userSet);
 
-        userStorage.addNewUser(user.toBuilder()
+        userStorage.addNew(user.toBuilder()
                 .id(0)
                 .login("lois")
                 .email("pochta@pochta.com")
@@ -124,6 +124,6 @@ public class UserStorageTest {
         assertEquals(userStorage.getCommonFriends(1, 3), userSet);
 
         userStorage.removeFriend(1, 2);
-        assertEquals(userStorage.getUserFriends(1), new HashSet<>());
+        assertEquals(userStorage.getFriendsByUserId(1), new HashSet<>());
     }
 }

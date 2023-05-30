@@ -23,7 +23,7 @@ public class MpaStorageTest {
     @Test
     @Order(1)
     public void testGetMpas() {
-        assertThat(mpaDbStorage.getMpas())
+        assertThat(mpaDbStorage.getAll())
                 .asList()
                 .hasSize(5)
                 .hasOnlyElementsOfType(Mpa.class);
@@ -32,7 +32,7 @@ public class MpaStorageTest {
     @Test
     @Order(2)
     public void testGetMpaById() {
-        assertThat(mpaDbStorage.getMpaById(1))
+        assertThat(mpaDbStorage.getById(1))
                 .extracting(Mpa::getId, Mpa::getName)
                 .containsExactly(1, "G");
     }
@@ -41,7 +41,7 @@ public class MpaStorageTest {
     @Order(3)
     public void testAddNewMpa() {
         Mpa mpa = Mpa.builder().name("new Mpa").build();
-        assertThat(mpaDbStorage.addNewMpa(mpa))
+        assertThat(mpaDbStorage.addNew(mpa))
                 .extracting(Mpa::getId, Mpa::getName)
                 .containsExactly(6, "new Mpa");
     }
@@ -50,7 +50,7 @@ public class MpaStorageTest {
     @Order(4)
     public void testUpdateMpa() {
         Mpa mpa = Mpa.builder().id(6).name("updated Mpa").build();
-        assertThat(mpaDbStorage.updateMpa(mpa))
+        assertThat(mpaDbStorage.update(mpa))
                 .extracting(Mpa::getId, Mpa::getName)
                 .containsExactly(6, "updated Mpa");
     }
@@ -58,8 +58,8 @@ public class MpaStorageTest {
     @Test
     @Order(5)
     public void testRemoveMpa() {
-        mpaDbStorage.removeMpaById(6);
-        assertThat(mpaDbStorage.getMpas())
+        mpaDbStorage.removeById(6);
+        assertThat(mpaDbStorage.getAll())
                 .asList()
                 .hasSize(5)
                 .doesNotContain(Mpa.builder()

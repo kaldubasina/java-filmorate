@@ -20,20 +20,20 @@ public class UserService {
     }
 
     public Collection<User> getUsers() {
-        return userStorage.getUsers();
+        return userStorage.getAll();
     }
 
     public User getUserById(int id) {
-        return userStorage.getUserById(id)
+        return userStorage.getById(id)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
     }
 
     public User addNewUser(User user) {
-        return userStorage.addNewUser(user);
+        return userStorage.addNew(user);
     }
 
     public User updateUser(User user) {
-        return userStorage.updateUser(user);
+        return userStorage.update(user);
     }
 
     public void addFriend(Integer userId, Integer friendId) {
@@ -45,7 +45,7 @@ public class UserService {
     }
 
     public Collection<User> getUserFriends(Integer userId) {
-        return userStorage.getUserFriends(userId);
+        return userStorage.getFriendsByUserId(userId);
     }
 
     public Collection<User> getCommonFriends(Integer userId, Integer otherId) {

@@ -23,7 +23,7 @@ public class GenreStorageTest {
     @Test
     @Order(1)
     public void testGetGenres() {
-        assertThat(genreDbStorage.getGenres())
+        assertThat(genreDbStorage.getAll())
                 .asList()
                 .hasSize(6)
                 .hasOnlyElementsOfType(Genre.class);
@@ -33,7 +33,7 @@ public class GenreStorageTest {
     @Order(2)
     public void testAddNewGenre() {
         Genre genre = Genre.builder().name("new Genre").build();
-        assertThat(genreDbStorage.addNewGenre(genre))
+        assertThat(genreDbStorage.addNew(genre))
                 .extracting(Genre::getId, Genre::getName)
                 .containsExactly(7, "new Genre");
     }
@@ -41,7 +41,7 @@ public class GenreStorageTest {
     @Test
     @Order(3)
     public void testGetGenreById() {
-        assertThat(genreDbStorage.getGenreById(7))
+        assertThat(genreDbStorage.getById(7))
                 .extracting(Genre::getId, Genre::getName)
                 .containsExactly(7, "new Genre");
     }
@@ -50,7 +50,7 @@ public class GenreStorageTest {
     @Order(4)
     public void testUpdateGenre() {
         Genre genre = Genre.builder().id(7).name("updated Genre").build();
-        assertThat(genreDbStorage.updateGenre(genre))
+        assertThat(genreDbStorage.update(genre))
                 .extracting(Genre::getId, Genre::getName)
                 .containsExactly(7, "updated Genre");
     }
@@ -58,8 +58,8 @@ public class GenreStorageTest {
     @Test
     @Order(5)
     public void testRemoveGenre() {
-        genreDbStorage.removeGenreById(1);
-        assertThat(genreDbStorage.getGenres())
+        genreDbStorage.removeById(1);
+        assertThat(genreDbStorage.getAll())
                 .asList()
                 .hasSize(6)
                 .doesNotContain(Genre.builder()

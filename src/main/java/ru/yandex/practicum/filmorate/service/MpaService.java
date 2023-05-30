@@ -17,22 +17,22 @@ public class MpaService {
     }
 
     public Mpa getMpaById(Integer id) {
-        return mpaDbStorage.getMpaById(id);
+        return mpaDbStorage.getById(id);
     }
 
     public Collection<Mpa> getMpas() {
-        return mpaDbStorage.getMpas();
+        return mpaDbStorage.getAll();
     }
 
     public Mpa addNewMpa(Mpa mpa) {
-        return mpaDbStorage.addNewMpa(mpa);
+        return mpaDbStorage.addNew(mpa);
     }
 
     public Mpa updateMpa(Mpa mpa) {
-        return mpaDbStorage.updateMpa(mpa);
+        return mpaDbStorage.update(mpa);
     }
 
     public void removeMpaById(Integer id) {
-        mpaDbStorage.removeMpaById(id);
+        mpaDbStorage.removeById(id);
     }
 }
