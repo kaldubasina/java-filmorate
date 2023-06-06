@@ -4,7 +4,7 @@
 Spring Boot приложение для работы с фильмами и оценками пользователей.
 
 ## Схема базы данных
-![dbDiagram](SQLbd.png)
+![dbDiagram](Schema.png)
 
 #### Таблица films хранит информацию о фильмах:
 - id - идентификатор фильма;
@@ -42,27 +42,35 @@ Spring Boot приложение для работы с фильмами и оц
 - добавление фильма
 ```sql
  INSERT INTO films (name, description, date, duration, rating)
- VALUES (..., ..., ..., ..., ...)
+ VALUES (?, ?, ?, ?, ?)
  ```
 
 - добавление пользователя
 ```sql
  INSERT INTO users (email, login, name, birthday)
- VALUES (..., ..., ..., ...)
+ VALUES (?, ?, ?, ?)
  ```
 
 - получение информации о пользователе по id
  ```sql
  SELECT *
  FROM users
- WHERE id = ...
+ WHERE id = ?
  ```
 
 - получение информации о фильме по id
 ```sql
-SELECT f.*, COUNT(ul.user_id) AS user_rating
-FROM film AS f
-LEFT JOIN user_likes AS ul ON f.id = ul.film_id
-WHERE f.id = ...
-GROUP BY f.id
+ SELECT *
+ FROM films
+ WHERE id = ?
  ```
+
+- получение списка популярных фильмов
+```sql
+ SELECT f.*
+ FROM films f
+ LEFT JOIN film_likes AS fl ON f.id = fl.film_id
+ GROUP BY f.id
+ ORDER BY COIUNT(fl.user_id) desc, f.rate desc
+ LIMIT ?
+```
